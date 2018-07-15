@@ -1,4 +1,3 @@
-
 # ghettotcx.py
 #
 # MIT License
@@ -43,11 +42,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # For debugging/testing purposes:
-FILEDIRECTORY='./example_data'
-FILENAME='example.tcx'
-FILEPATH=os.path.join(FILEDIRECTORY, FILENAME)
+FILEDIRECTORY = './example_data'
+FILENAME = 'example.tcx'
+FILEPATH = os.path.join(FILEDIRECTORY, FILENAME)
+
 
 class TCX(object):
     """interface for objects that parse TCX files"""
@@ -75,10 +74,10 @@ class HeartRate(TCX):
     def _heartrate_parser(self, filename):
         "return a list of values with timestamp, heart rate given a xml file"
         relevant_tags = ['{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Trackpoint',
-                        '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time',
-                        '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}HeartRateBpm',
-                        '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value'
-        ]
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}HeartRateBpm',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value'
+                         ]
         group_name = ''
         counter = 0
         items = iterparse(filename, events=['start'])
@@ -117,12 +116,18 @@ class HeartRate(TCX):
         return self._df
 
     def zoneify(self, x):
-        if x['heartrate'] < 110:   return 1
-        elif x['heartrate'] < 136: return 2
-        elif x['heartrate'] < 150: return 3
-        elif x['heartrate'] < 174: return 4
-        elif x['heartrate'] >= 174: return 5
-        else:  return 0
+        if x['heartrate'] < 110:
+            return 1
+        elif x['heartrate'] < 136:
+            return 2
+        elif x['heartrate'] < 150:
+            return 3
+        elif x['heartrate'] < 174:
+            return 4
+        elif x['heartrate'] >= 174:
+            return 5
+        else:
+            return 0
 
     # TODO: Move to test file; this was old code
     def test_zoneify(self):
@@ -133,38 +138,36 @@ class HeartRate(TCX):
                  ({'heartrate': 150}, 4),
                  ({'heartrate': 200}, 5)]
         for test_input, expected in tests:
-            assert(expected == zoneify(test_input))
+            assert (expected == zoneify(test_input))
 
-    def plot(self, draw_plot=True, plt_=plt, fig_size=(5,5)):
+    def plot(self, draw_plot=True, plt_=plt, fig_size=(5, 5)):
         old_fig_size = plt.rcParams["figure.figsize"]
         plt.rcParams["figure.figsize"] = fig_size
         self.plot_heartrate(draw_plot=draw_plot, plt_=plt_)
         plt.rcParams["figure.figsize"] = old_fig_size
 
-
-    def plot_heartrate(self, draw_plot = True, plt_=plt):
+    def plot_heartrate(self, draw_plot=True, plt_=plt):
         plt_.plot(self._df['heartrate'])
         if draw_plot: plt_.show()
 
     def plot_heartrate_histogram(self, draw_plot=True):
         plotdata = plt.hist(self._df['heartrate'], bins=40)
-        hist_x = plotdata[1][:-1] # one too many values in x values array, so trim it down
+        hist_x = plotdata[1][:-1]  # one too many values in x values array, so trim it down
         hist_y = plotdata[0]
         if draw_plot: plt.show()
         return (hist_x, hist_y)
 
     def plot_heartratezone(self, draw_plot=True):
-        dfg=self._df.groupby('zone').count()
+        dfg = self._df.groupby('zone').count()
         bars = plt.bar(dfg.index, dfg.heartrate)
         if draw_plot: plt.show()
         return bars
 
     @classmethod
     def create_heartrate_panel(cls, heartrate_list, fig_size=(12, 24), draw_plot=True):
-        assert(isinstance(heartrate_list, list))
+        assert (isinstance(heartrate_list, list))
         old_fig_size = plt.rcParams["figure.figsize"]
         plt.rcParams["figure.figsize"] = fig_size
-
 
         num_rows = len(heartrate_list)
         _, pp = plt.subplots(num_rows, 2, sharex='col', sharey='col', squeeze=False)
@@ -209,17 +212,17 @@ class LatLong(TCX):
                         </Trackpoint>
         """
         relevant_tags = ['{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Trackpoint',
-                        '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time',
-                        '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Position',
-                        '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LatitudeDegrees',
-                        '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LongitudeDegrees',
-        ]
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Position',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LatitudeDegrees',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LongitudeDegrees',
+                         ]
         counter = 0
         items = iterparse(filename, events=['start'])
         values = []
         for (_, node) in items:
             counter += 1
-            #if counter > 1000: break
+            # if counter > 1000: break
             if node.tag not in relevant_tags:
                 # Ignore anything not part of the outline
                 continue
@@ -253,7 +256,7 @@ class LatLong(TCX):
         self._df = df.dropna()
         return self._df
 
-    def plot(self, draw_plot=True, plt_=plt, fig_size=(5,5)):
+    def plot(self, draw_plot=True, plt_=plt, fig_size=(5, 5)):
         old_fig_size = plt.rcParams["figure.figsize"]
         plt.rcParams["figure.figsize"] = fig_size
         plt.scatter(self._df['longitude'], self._df['latitude'])
@@ -262,7 +265,6 @@ class LatLong(TCX):
 
 
 if __name__ == '__main__':
-
     # Load single file and create some plots
     h = HeartRate(FILEPATH)
     h.plot_heartrate()
