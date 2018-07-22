@@ -145,30 +145,21 @@ class HeartRate(TCX):
         plt.rcParams["figure.figsize"] = fig_size
         self.plot_heartrate(draw_plot=draw_plot, plt_=plt_)
         plt.rcParams["figure.figsize"] = old_fig_size
-        
+
     def plot_heartrate(self, draw_plot=True, plt_=plt):
         plt_.plot(self._df['heartrate'])
-        if draw_plot: plt_.ylabel('beats per minute')
-        if draw_plot: plt_.xlabel('seconds')
-        if draw_plot: plt_.title('Heartrate')
         if draw_plot: plt_.show()
 
     def plot_heartrate_histogram(self, draw_plot=True):
         plotdata = plt.hist(self._df['heartrate'], bins=40)
         hist_x = plotdata[1][:-1]  # one too many values in x values array, so trim it down
         hist_y = plotdata[0]
-        if draw_plot: plt.ylabel('number of seconds')
-        if draw_plot: plt.xlabel('beats per minute')
-        if draw_plot: plt.title('Heartrate Histogram')
         if draw_plot: plt.show()
         return (hist_x, hist_y)
 
     def plot_heartratezone(self, draw_plot=True):
         dfg = self._df.groupby('zone').count()
         bars = plt.bar(dfg.index, dfg.heartrate)
-        if draw_plot: plt.ylabel('number of seconds')
-        if draw_plot: plt.xlabel('heart rate zone')
-        if draw_plot: plt.title('Heartrate Zones')
         if draw_plot: plt.show()
         return bars
 
@@ -269,9 +260,6 @@ class LatLong(TCX):
         old_fig_size = plt.rcParams["figure.figsize"]
         plt.rcParams["figure.figsize"] = fig_size
         plt.scatter(self._df['longitude'], self._df['latitude'])
-        if draw_plot: plt.xlabel('degree longitude')
-        if draw_plot: plt.ylabel('degree latitude')
-        if draw_plot: plt.title('Running Path')
         if draw_plot: plt_.show()
         plt.rcParams["figure.figsize"] = old_fig_size
 
@@ -289,4 +277,3 @@ if __name__ == '__main__':
     # Plot the long/lat points on a scatterplot
     l = LatLong(FILEPATH)
     l.plot()
-  
