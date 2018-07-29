@@ -169,6 +169,7 @@ class HeartRate(TCX):
         if draw_plot: plt.ylabel('number of seconds')
         if draw_plot: plt.xlabel('heart rate zone')
         if draw_plot: plt.title('Heartrate Zones')
+        if draw_plot: plt.xticks(dfg.index,('warm up', 'fat burning','aerob','anaerob','extrem'))
         if draw_plot: plt.show()
         return bars
 
