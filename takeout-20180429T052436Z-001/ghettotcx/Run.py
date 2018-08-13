@@ -8,6 +8,7 @@ from xml.etree.ElementTree import iterparse
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from ghettotcx import HeartRate, LatLong, TCX
 
 class Run:
     # Standard start of an object method
@@ -24,6 +25,10 @@ class Run:
         self._AltitudeMeters = AltitudeMeters
         self._AverageHeartRateBpm = AverageHeartRateBpm
         self._MaximumHeartRateBpm = MaximumHeartRateBpm
+        # For debugging/testing purposes:
+        FILEDIRECTORY = './example_data'
+        FILENAME = 'example.tcx'
+        FILEPATH = os.path.join(filedirectory, filename)
         def getActivitySport(self):
         return self._ActivitySport
     
@@ -39,22 +44,17 @@ class Run:
         def getMaximumHeartRateBpm(self):
         return self._MaximumHeartRateBpm
         
-        def _heartrate_parser(self, filename):
+        def _heartrate_parser(self, filename=FILEPATH):
         "return a list of values with timestamp, heart rate given a xml file"
         relevant_tags = ['{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Trackpoint',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}HeartRateBpm',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value',
-                         
-'{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Activity Sport',
-                         
-'{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}DistanceMeters',
-                         
-'{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AltitudeMeters',
-                         
-'{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AverageHearRateBpm',
-                       
-'{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm'
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Activity Sport',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}DistanceMeters',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AltitudeMeters',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AverageHearRateBpm',
+                       '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm'
                         
                         ]
         group_name = ''
