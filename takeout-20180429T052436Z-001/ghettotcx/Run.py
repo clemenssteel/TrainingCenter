@@ -54,8 +54,9 @@ class Run:
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}DistanceMeters',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AltitudeMeters',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AverageHearRateBpm',
-                       '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm'
-                        
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Activity',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Notes'      
                         ]
         group_name = ''
         counter = 0
@@ -71,13 +72,19 @@ class Run:
             # Output a heartrate entry
             if node.tag:
                 if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time':
-                    timevalue = node.text.strip() if node.text else np.nan
+                    Timevalue = node.text.strip() if node.text else np.nan
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}HeartRateBpm':
                     # grab next value
                     (event, node) = next(items)
                     if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value':
-                        heartrate = node.text.strip() if node.text else np.nan
+                        Heartrate = node.text.strip() if node.text else np.nan
                     val = (timevalue, heartrate)
+                    values.append(val)
+                elif node.tag == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm':
+                (event, node) = next(items)
+                    if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value':
+                        MaximumHeartrate = node.text.strip() if node.text else np.nan 
+                    val = (Timevalue, Heartrate, MaximumHeartrate)
                     values.append(val)
                 else:
                     pass
