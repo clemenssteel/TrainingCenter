@@ -29,22 +29,31 @@ class Run:
         FILEDIRECTORY = './example_data'
         FILENAME = 'example.tcx'
         FILEPATH = os.path.join(filedirectory, filename)
-        def getActivitySport(self):
-        return self._ActivitySport
+        def getActivity(self):
+        return self._Activity
     
         def getDistanceMeters(self):
         return self._DistanceMeters
     
         def getAltitudeMeters(self):
-        return self._AltitudeMeters
+        return self._Values
     
-        def getAverageHeartRateBpm(self):
-        return self._AverageHearRateBpm
+        def getAverageHeartRate(self):
+        return self._AverageHearRate
     
-        def getMaximumHeartRateBpm(self):
-        return self._MaximumHeartRateBpm
+        def getMaximumHeartRate(self):
+        return self._MaximumHeartRate
         
-        def _heartrate_parser(self, filename=FILEPATH):
+        def getCalories(self):
+        return self._Calories
+    
+        def getTotalTime(self):
+        return self._TotalTime
+    
+        def getTotalTime(self):
+        return self._StartTime
+        
+        def _parser(self, filename=FILEPATH):
         "return a list of values with timestamp, heart rate given a xml file"
         relevant_tags = ['{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Trackpoint',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time',
@@ -53,17 +62,32 @@ class Run:
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Activity Sport',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}DistanceMeters',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AltitudeMeters',
-                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AverageHearRateBpm',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AverageHeartRateBpm',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm',
-                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Activity',
-                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Notes'      
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Notes',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}TotalTimeSeconds',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Calories',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AltitudeMeters',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LatitudeDegrees',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LongitudeDegrees',
+                         '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Id'
+                                
                         ]
         group_name = ''
         counter = 0
-        items = iterparse(filename, events=['start'])
-        timevalue = ""
-        heartrate = ""
-        values = []
+        items = iterparse(filepath4, events=['start'])
+        Timevalue = ""
+        Heartrate = ""
+        self._MaximumHeartRate = ""
+        self._AverageHearRate = ""
+        self._Activity = ""
+        self._TotalTime = ""
+        self._Calories = ""
+        self._DistanceMeters = ""
+        AltitudeMeters = ""
+        LatitudeDegrees = ""
+        LongitudeDegrees = ""
+        self._Values = []
         for (event, node) in items:
             counter += 1
             if node.tag not in relevant_tags:
@@ -71,46 +95,45 @@ class Run:
                 continue
             # Output a heartrate entry
             if node.tag:
-                if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time':
+                if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Notes':
+                    self._Activity = node.text.strip() if node.text else np.nan 
+                    print(self._Activity)
+                elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}TotalTimeSeconds':
+                    self._TotalTime = node.text.strip() if node.text else np.nan 
+                    print("Total Time "+self._TotalTime)
+                elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Calories':
+                    self._Calories = node.text.strip() if node.text else np.nan 
+                    print("Calories "+self._Calories)
+                elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Id':
+                    self._StartTime = node.text.strip() if node.text else np.nan 
+                    print("StartTime "+self._StartTime)
+                elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}DistanceMeters':
+                    self._DistanceMeters = node.text.strip() if node.text else np.nan 
+                elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LatitudeDegrees':
+                    LatitudeDegrees = node.text.strip() if node.text else np.nan
+                elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LongitudeDegrees':
+                    LongitudeDegrees = node.text.strip() if node.text else np.nan 
+                elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time':
                     Timevalue = node.text.strip() if node.text else np.nan
+                elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AltitudeMeters':
+                    AltitudeMeters = node.text.strip() if node.text else np.nan  
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}HeartRateBpm':
                     # grab next value
                     (event, node) = next(items)
                     if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value':
                         Heartrate = node.text.strip() if node.text else np.nan
-                    val = (timevalue, heartrate)
-                    values.append(val)
+                    val = (Timevalue, Heartrate, AltitudeMeters, LatitudeDegrees, LongitudeDegrees)
+                    self._Values.append(val)
                 elif node.tag == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm':
-                (event, node) = next(items)
+                    (event, node) = next(items)
                     if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value':
-                        MaximumHeartrate = node.text.strip() if node.text else np.nan 
-                    val = (Timevalue, Heartrate, MaximumHeartrate)
-                    values.append(val)
+                        self._MaximumHeartRate = node.text.strip() if node.text else np.nan 
+                        print("Stored MaximumHeartRate "+self._MaximumHeartRate)
+                elif node.tag == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AverageHeartRateBpm':
+                    (event, node) = next(items)
+                    if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value':
+                        self._AverageHearRate = node.text.strip() if node.text else np.nan 
+                        print("Stored AverageHeartRate "+self._AverageHearRate)        
                 else:
                     pass
-        return values
-
-    def ausgabe(self):
-        print("Der Becher hat ein Volumen von " +str(self._Volumen)+\
-              "ml und eine Füllmenge von "+str(self._Fuellmenge)+"ml.")
-    def getFüllmenge(self):
-        return self._Fuellmenge
-    def getVolumen(self):
-        return self._Volumen
-    def auffüllen(self,Vein):
-        Raum = self._Volumen-self._Fuellmenge
-        if Raum<=Vein:
-            Vein = Raum
-            print("Kein Platz zum vollständigen Einfüllen!")
-            self._Fuellmenge+=Vein
-        else:
-            self._Fuellmenge+=Vein    
-        return Vein
-    def entnehmen(self,Vaus):
-        if self._Fuellmenge<Vaus:
-            print("Es kann nicht genug entnommen werden!")
-            self._Fuellmenge=0
-            Entnommen = self._Fuellmenge
-        else:
-            Entnommen = Vaus
-        return Entnommen
+        return self._Values
