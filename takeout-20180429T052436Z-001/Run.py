@@ -12,49 +12,46 @@ from ghettotcx import HeartRate, LatLong, TCX
 
 class Run:
     # Standard start of an object method
-    def __init__(self, ActivitySport='Running', DistanceMeters=0, AltitudeMeters=0, AverageHeartRateBpm=0, MaximumHeartRateBpm=0, TotalTimeSeconds=0):
+    def __init__(self, filedirectory = './example_data', filename = 'example.tcx'):
         # Object attributes are implemented by setting an standard value
-        if ActivitySport=='Running':
-            print("That is a fast run")
-        elif ActivitySport=='Jogging':
-            print("That is classical jogging.")
-        else:
-            print("That is an other sport.")
-        self._ActivitySport = ActivitySport 
-        self._DistanceMeters = DistanceMeters
-        self._AltitudeMeters = AltitudeMeters
-        self._AverageHeartRateBpm = AverageHeartRateBpm
-        self._MaximumHeartRateBpm = MaximumHeartRateBpm
+        self._filedirectory = filedirectory
+        self._filename = filename
+        self._filepath = os.path.join(filedirectory, filename)
         # For debugging/testing purposes:
         FILEDIRECTORY = './example_data'
         FILENAME = 'example.tcx'
         FILEPATH = os.path.join(filedirectory, filename)
-        def getActivity(self):
+        self._Parser()
+    def getActivity(self):
         return self._Activity
-    
-        def getDistanceMeters(self):
+
+    def getDistanceMeters(self):
         return self._DistanceMeters
-    
-        def getAltitudeMeters(self):
+
+    def getAltitudeMeters(self):
         return self._Values
-    
-        def getAverageHeartRate(self):
+
+    def getAverageHeartRate(self):
         return self._AverageHearRate
-    
-        def getMaximumHeartRate(self):
+
+    def getMaximumHeartRate(self):
         return self._MaximumHeartRate
-        
-        def getCalories(self):
+
+    def getCalories(self):
         return self._Calories
-    
-        def getTotalTime(self):
+
+    def getTotalTime(self):
         return self._TotalTime
-    
-        def getTotalTime(self):
+
+    def getTotalTime(self):
         return self._StartTime
-        
-        def _parser(self, filename=FILEPATH):
+
+    def _Parser(self):
+        #def _Parser(self, filedirectory = './example_data', filename = 'example.tcx'):
         "return a list of values with timestamp, heart rate given a xml file"
+        #self._filedirectory = filedirectory
+        #self._filename = filename
+        #self._filepath = os.path.join(filedirectory, filename)
         relevant_tags = ['{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Trackpoint',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}HeartRateBpm',
@@ -71,11 +68,11 @@ class Run:
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LatitudeDegrees',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LongitudeDegrees',
                          '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Id'
-                                
+
                         ]
         group_name = ''
         counter = 0
-        items = iterparse(filepath4, events=['start'])
+        items = iterparse(self._filepath, events=['start'])
         Timevalue = ""
         Heartrate = ""
         self._MaximumHeartRate = ""
