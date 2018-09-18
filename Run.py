@@ -43,7 +43,7 @@ class Run:
     def getTotalTime(self):
         return self._TotalTime
 
-    def getTotalTime(self):
+    def getStartTime(self):
         return self._StartTime
 
     def _Parser(self):
