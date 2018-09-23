@@ -4,6 +4,7 @@ Class to read, classify and tread separated runs from GoogleFit. Afterwards pret
 @author: Clemens Steel
 '''
 import os
+from glob import glob
 from xml.etree.ElementTree import iterparse
 import pandas as pd
 import numpy as np
@@ -22,6 +23,14 @@ class Run:
         FILENAME = 'example.tcx'
         FILEPATH = os.path.join(filedirectory, filename)
         self._Parser()
+    def read_runs_folder(folder):
+        resultant_runs = {}
+        files = glob(folder + '*.tcx')
+        #for file in os.listdir(folder):
+        for file in files:
+            tmp=Run(folder, os.path.split(file)[1])
+            resultant_runs[tmp._StartTime] =tmp
+        return resultant_runs
     def getActivity(self):
         return self._Activity
 
@@ -43,7 +52,7 @@ class Run:
     def getTotalTime(self):
         return self._TotalTime
 
-    def getTotalTime(self):
+    def getStartTime(self):
         return self._StartTime
 
     def _Parser(self):
@@ -94,16 +103,16 @@ class Run:
             if node.tag:
                 if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Notes':
                     self._Activity = node.text.strip() if node.text else np.nan 
-                    print(self._Activity)
+                    #print(self._Activity)
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}TotalTimeSeconds':
                     self._TotalTime = node.text.strip() if node.text else np.nan 
-                    print("Total Time "+self._TotalTime)
+                    #print("Total Time "+self._TotalTime)
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Calories':
                     self._Calories = node.text.strip() if node.text else np.nan 
-                    print("Calories "+self._Calories)
+                    #print("Calories "+self._Calories)
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Id':
                     self._StartTime = node.text.strip() if node.text else np.nan 
-                    print("StartTime "+self._StartTime)
+                    #print("StartTime "+self._StartTime)
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}DistanceMeters':
                     self._DistanceMeters = node.text.strip() if node.text else np.nan 
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LatitudeDegrees':
@@ -125,12 +134,12 @@ class Run:
                     (event, node) = next(items)
                     if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value':
                         self._MaximumHeartRate = node.text.strip() if node.text else np.nan 
-                        print("Stored MaximumHeartRate "+self._MaximumHeartRate)
+                        #print("Stored MaximumHeartRate "+self._MaximumHeartRate)
                 elif node.tag == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AverageHeartRateBpm':
                     (event, node) = next(items)
                     if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value':
                         self._AverageHearRate = node.text.strip() if node.text else np.nan 
-                        print("Stored AverageHeartRate "+self._AverageHearRate)        
+                        #print("Stored AverageHeartRate "+self._AverageHearRate)        
                 else:
                     pass
         return self._Values
