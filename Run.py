@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from ghettotcx import HeartRate, LatLong, TCX
+import time
 
 class Run:
     # Standard start of an object method
@@ -54,6 +55,10 @@ class Run:
 
     def getStartTime(self):
         return self._StartTime
+    
+    def getValues(self):
+        myarray = np.asarray(self._Values)
+        return myarray
 
     def _Parser(self):
         #def _Parser(self, filedirectory = './example_data', filename = 'example.tcx'):
@@ -122,13 +127,35 @@ class Run:
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Time':
                     Timevalue = node.text.strip() if node.text else np.nan
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}AltitudeMeters':
-                    AltitudeMeters = node.text.strip() if node.text else np.nan  
+                    AltitudeMeters = node.text.strip() if node.text else np.nan         
                 elif node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}HeartRateBpm':
                     # grab next value
                     (event, node) = next(items)
                     if node.tag.strip() == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Value':
                         Heartrate = node.text.strip() if node.text else np.nan
-                    val = (Timevalue, Heartrate, AltitudeMeters, LatitudeDegrees, LongitudeDegrees)
+                    try: 
+                        Heartrate = float(Heartrate)
+                    except ValueError:
+                        Heartrate = 0
+                    try: 
+                        AltitudeMeters = float(AltitudeMeters)
+                    except ValueError:
+                        AltitudeMeters = 0
+                    try:
+                        Timevalue = str(Timevalue)
+                        Timevalue = time.strptime(Timevalue[:19], "%Y-%m-%dT%H:%M:%S")
+                    except ValueError:
+                        Timevalue = 0
+                    try: 
+                        LatitudeDegrees = float(LatitudeDegrees)
+                    except ValueError:
+                        LatitudeDegrees = 0
+                    try: 
+                        LongitudeDegrees = float(LongitudeDegrees)
+                    except ValueError:
+                        LongitudeDegrees = 0
+                    #val = [Heartrate,  AltitudeMeters, LatitudeDegrees, LongitudeDegrees]
+                    val = [Timevalue, Heartrate,  AltitudeMeters, LatitudeDegrees, LongitudeDegrees]
                     self._Values.append(val)
                 elif node.tag == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm':
                     (event, node) = next(items)
