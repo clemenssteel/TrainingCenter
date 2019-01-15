@@ -98,6 +98,7 @@ class Run:
         AltitudeMeters = ""
         LatitudeDegrees = ""
         LongitudeDegrees = ""
+        df = pd.dataframe()
         self._Values = []
         for (event, node) in items:
             counter += 1
@@ -154,7 +155,9 @@ class Run:
                         LongitudeDegrees = float(LongitudeDegrees)
                     except ValueError:
                         LongitudeDegrees = 0
-                    #val = [Heartrate,  AltitudeMeters, LatitudeDegrees, LongitudeDegrees]
+                    df_temp = pd.dataframe(Heartrate,  AltitudeMeters, LatitudeDegrees, LongitudeDegrees)
+                    
+                    df.append()
                     val = [Timevalue, Heartrate,  AltitudeMeters, LatitudeDegrees, LongitudeDegrees]
                     self._Values.append(val)
                 elif node.tag == '{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}MaximumHeartRateBpm':
